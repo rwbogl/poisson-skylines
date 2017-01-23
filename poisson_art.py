@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-poisson_art.py - create city skyline type things with probability
+poisson_art.py - create city skyline art using a modified Poisson-process
 """
 
 import numpy as np
