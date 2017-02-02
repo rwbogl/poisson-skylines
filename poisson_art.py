@@ -26,6 +26,26 @@ steps = [50, 50, 50]
 alpha = [.3, .6, .9]
 lws = [2, 3, 8]
 
+def drawing_init(figsize=None):
+    """TODO: Docstring for drawing_init.
+    :returns: TODO
+
+    """
+    plt.style.use("ggplot")
+    fig = plt.figure(figsize=figsize) if figsize else plt.figure()
+
+    # Turn off ticks for both axes (but don't turn off the axes, because we
+    # want to do background colors).
+    plt.tick_params(
+        axis='both',
+        which='both',
+        bottom='off',
+        left="off",
+        labelleft="off",
+        top='off',
+        labelbottom='off')
+    return fig
+
 def draw_picture(betas, steps, alphas, lws):
     """Draw a picture of the results from the given paramters.
 
@@ -39,20 +59,7 @@ def draw_picture(betas, steps, alphas, lws):
     results = [simulate_process(beta, steps) for beta, steps in
                     zip(betas, steps)]
 
-    plt.style.use("ggplot")
-    plt.figure(figsize=(18, 10))
-    #plt.axis("off")
-    # Turn off ticks for both axes (but don't turn off the axes, because we
-    # want to do background colors).
-    plt.tick_params(
-        axis='both',
-        which='both',
-        bottom='off',
-        left="off",
-        labelleft="off",
-        top='off',
-        labelbottom='off')
-
+    drawing_init((45, 20))
     for result, alpha, lw in zip(results, alphas, lws):
         ts, ys = result
         plt.step(ts, ys, alpha=alpha, lw=lw)
@@ -72,22 +79,13 @@ def animations(betas, steps, alphas, lws):
     results = [simulate_process(beta, steps) for beta, steps in
                     zip(betas, steps)]
 
-    fig = plt.figure(figsize=(18, 10))
+    fig = drawing_init()
     max_t = np.min([ts.max() for ts, ys in results])
     max_y = np.max([ys.max() for ts, ys in results])
     max_y *= 1.1
 
     ax = plt.axes(xlim=(0, max_t), ylim=(0, max_y))
     lines = [ax.plot([0], [0], lw=lw, alpha=alpha)[0] for lw, alpha in zip(lws, alphas)]
-
-    plt.tick_params(
-        axis='both',
-        which='both',
-        bottom='off',
-        left="off",
-        labelleft="off",
-        top='off',
-        labelbottom='off')
 
     def init():
         for line in lines:
@@ -139,8 +137,6 @@ def animations(betas, steps, alphas, lws):
             line.set_data(new_ts, new_ys)
 
         return lines
-
-    plt.style.use("ggplot")
 
     # TODO: Change this to "frames_per_unit" and then use segment length. This
     # will create "smoother" drawings.
