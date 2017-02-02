@@ -177,3 +177,15 @@ def save_animation(anim, filename, anim_writer="ffmpeg"):
     writer = Writer(fps=25, metadata=dict(artist="poisson_art.py"),
                         bitrate=1800)
     anim.save(filename, writer=writer)
+
+def batch_save(n, base_name="skyline"):
+    """Save a batch of `n` random skylines.
+
+    :n: TODO
+    :returns: TODO
+
+    """
+    for k in range(n):
+        fig = draw_picture(betas, steps, alphas, lws)
+        plt.savefig("{}_{}.png".format(base_name, k), bbox_inches="tight")
+        plt.close()
