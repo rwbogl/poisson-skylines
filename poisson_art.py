@@ -27,9 +27,9 @@ alpha = [.3, .6, .9]
 lws = [2, 3, 8]
 
 def drawing_init(figsize=None):
-    """TODO: Docstring for drawing_init.
-    :returns: TODO
+    """Setup initial values for skyline art.
 
+    :returns: Created figure for drawing.
     """
     plt.style.use("ggplot")
     fig = plt.figure(figsize=figsize) if figsize else plt.figure()
@@ -49,11 +49,11 @@ def drawing_init(figsize=None):
 def draw_picture(betas, steps, alphas, lws):
     """Draw a picture of the results from the given paramters.
 
-    :betas: TODO
-    :steps: TODO
-    :alphas: TODO
-    :lws: TODO
-    :returns: TODO
+    :betas: List of parameters for the pseduo-poisson processes.
+    :steps: List of number of jump points to include for each process.
+    :alphas: List of alpha (transparency) values for each process.
+    :lws: List of line-widths for each process.
+    :returns: Nothing.
 
     """
     results = [simulate_process(beta, steps) for beta, steps in
@@ -75,7 +75,15 @@ alphas = [.3, .6, .9]
 lws = [2, 3, 5]
 
 def animations(betas, steps, alphas, lws):
+    """Draw an animation of a simulation of our pseduo-poisson process.
 
+    :betas: List of parameters for the pseduo-poisson processes.
+    :steps: List of number of jump points to include for each process.
+    :alphas: List of alpha (transparency) values for each process.
+    :lws: List of line-widths for each process.
+    :returns: Animation object.
+
+    """
     results = [simulate_process(beta, steps) for beta, steps in
                     zip(betas, steps)]
 
