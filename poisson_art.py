@@ -53,13 +53,13 @@ def draw_picture(betas, steps, alphas, lws):
     :steps: List of number of jump points to include for each process.
     :alphas: List of alpha (transparency) values for each process.
     :lws: List of line-widths for each process.
-    :returns: Nothing.
+    :returns: Figure drawn on.
 
     """
     results = [simulate_process(beta, steps) for beta, steps in
                     zip(betas, steps)]
 
-    drawing_init((45, 20))
+    fig = drawing_init((45, 20))
     for result, alpha, lw in zip(results, alphas, lws):
         ts, ys = result
         plt.step(ts, ys, alpha=alpha, lw=lw)
@@ -67,7 +67,7 @@ def draw_picture(betas, steps, alphas, lws):
         plt.gca().set_axis_bgcolor((.95, .95, .95))
     plt.xlim(0, np.min([ts.max() for ts, ys in results]))
 
-# Animation stuff.
+    return fig
 
 betas = [1, 1, 1]
 steps = [50, 50, 50]
