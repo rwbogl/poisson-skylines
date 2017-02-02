@@ -67,51 +67,109 @@ steps = [50, 50, 50]
 alphas = [.3, .6, .9]
 lws = [2, 3, 5]
 
-results = [simulate_process(beta, steps) for beta, steps in
-                zip(betas, steps)]
+def animations(betas, steps, alphas, lws):
 
-fig = plt.figure(figsize=(18, 10))
-max_t = np.min([ts.max() for ts, ys in results])
-max_y = np.max([ys.max() for ts, ys in results])
-max_y *= 1.1
+    results = [simulate_process(beta, steps) for beta, steps in
+                    zip(betas, steps)]
 
-ax = plt.axes(xlim=(0, max_t), ylim=(0, max_y))
-lines = [ax.step([], [], lw=lw, alpha=alpha)[0] for lw, alpha in zip(lws, alphas)]
+    fig = plt.figure(figsize=(18, 10))
+    max_t = np.min([ts.max() for ts, ys in results])
+    max_y = np.max([ys.max() for ts, ys in results])
+    max_y *= 1.1
 
-plt.tick_params(
-    axis='both',
-    which='both',
-    bottom='off',
-    left="off",
-    labelleft="off",
-    top='off',
-    labelbottom='off')
+    ax = plt.axes(xlim=(0, max_t), ylim=(0, max_y))
+    lines = [ax.plot([0], [0], lw=lw, alpha=alpha)[0] for lw, alpha in zip(lws, alphas)]
 
-def init():
-    for line in lines:
-        line.set_data([], [])
-    return lines
+    plt.tick_params(
+        axis='both',
+        which='both',
+        bottom='off',
+        left="off",
+        labelleft="off",
+        top='off',
+        labelbottom='off')
 
-def animate(i):
-    global results
-    if i == 0:
-        # Create new results to plot.
-        results = [simulate_process(beta, steps) for beta, steps in
-                        zip(betas, steps)]
-        max_t = np.min([ts.max() for ts, ys in results])
-        max_y = np.max([ys.max() for ts, ys in results])
-        max_y *= 1.1
-        plt.xlim(0, max_t)
-        plt.ylim(0, max_y)
+    def init():
+        for line in lines:
+            line.set_data([0], [0])
+        return lines
 
-    for result, line in zip(results, lines):
-        ts, ys = result
-        ts, ys = ts[:i], ys[:i]
-        line.set_data(ts, ys)
+    def animate(i):
+        global results
+        if i == 0:
+            # Create new results to plot.
+            results = [simulate_process(beta, steps) for beta, steps in
+                            zip(betas, steps)]
+            max_t = np.min([ts.max() for ts, ys in results])
+            max_y = np.max([ys.max() for ts, ys in results])
+            max_y *= 1.1
+            plt.xlim(0, max_t)
+            plt.ylim(0, max_y)
 
-    return lines
+        for result, line in zip(results, lines):
+            ts, ys = result
+            # There are two line segments per point.
+            point_to = i // (2*frames_per_segment)
 
-plt.style.use("ggplot")
-anim = animation.FuncAnimation(fig, animate, init_func=init,
-                                frames=len(results[0][0]), interval=60)
-plt.show()
+            t_start, y_start = ts[point_to], ys[point_to]
+            t_end, y_end = ts[point_to + 1], ys[point_to + 1]
+
+            plotted_ts, plotted_ys = line.get_data()
+            current_t, current_y = plotted_ts[-1], plotted_ys[-1]
+
+            # First: Move to the new t-coordinate.
+            # Second: Move to the new y-coordinate.
+            # This will create a bar-plot like thing.
+
+            if not np.isclose(current_t, t_end):
+                # Move to the new t-coordinate.
+                dt = (t_end - t_start) / frames_per_segment
+                new_t = current_t + dt
+                new_y = current_y
+            else:
+                # Move to the new y-coordinate.
+                dy = (y_end - y_start) / frames_per_segment
+                new_y = current_y + dy
+                new_t = current_t
+
+            # Add new point to the list.
+            new_ts = np.append(plotted_ts, new_t)
+            new_ys = np.append(plotted_ys, new_y)
+
+            line.set_data(new_ts, new_ys)
+
+        return lines
+
+    plt.style.use("ggplot")
+
+    # TODO: Change this to "frames_per_unit" and then use segment length. This
+    # will create "smoother" drawings.
+    # This is difficult, because different drawings will produce different numbers
+    # of frames, and matplotlib only allows a fixed number.
+    frames_per_segment = 5
+
+    n_points = len(results[0][0])
+    n_segments = n_points
+
+    # Remove the last segment so we stop trying to move after the last segment,
+    # which causes an IndexError.
+    # Also, times two because there are two line segments per point.
+    n_frames = 2 * (frames_per_segment - 1) * n_points
+    anim = animation.FuncAnimation(fig, animate, init_func=init,
+                                    frames=n_frames, interval=10)
+
+    return anim
+
+def save_animation(anim, filename, anim_writer="ffmpeg"):
+    """Save a skyline animation under the given filename.
+
+    :anim: matplotlib.animation object.
+    :filename: Filename to save animation under.
+    :anim_writer: matplotlib.animation.writer option, e.g. "ffmpeg".
+    :returns: Nothing.
+
+    """
+    Writer = animation.writers[anim_writer]
+    writer = Writer(fps=25, metadata=dict(artist="poisson_art.py"),
+                        bitrate=1800)
+    anim.save(filename, writer=writer)
