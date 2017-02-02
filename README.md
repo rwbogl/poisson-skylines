@@ -4,7 +4,10 @@ This code uses a continuous time Markov chain similar to the [Poisson
 Process](https://en.wikipedia.org/wiki/Poisson_point_process) to draw pictures.
 I think that these pictures look a bit like city skylines.
 
-Examples can be found in the [./tests](./tests) folder.
+Below is an example. Further examples can be found in the [./tests](./tests)
+folder.
+
+![Example skyline using our pseduo-poisson process](./tests/skyline_5.png)
 
 ## Process Construction
 
