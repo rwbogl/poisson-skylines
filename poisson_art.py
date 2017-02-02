@@ -11,6 +11,12 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib
 
+# Drawing parameters.
+betas = [1, 2, 1]
+steps = [50, 50, 50]
+alpha = [.3, .6, .9]
+lws = [2, 3, 8]
+
 def simulate_process(beta, steps):
     """
     :beta: Mean holding time.
@@ -20,11 +26,6 @@ def simulate_process(beta, steps):
     jump_times = [0] + list(accumulate(holding_times))
     states = [0] + [np.random.poisson(delta_t) for delta_t in holding_times]
     return np.array(jump_times), np.array(states)
-
-betas = [1, 1, 1]
-steps = [50, 50, 50]
-alpha = [.3, .6, .9]
-lws = [2, 3, 8]
 
 def drawing_init(figsize=None):
     """Setup initial values for skyline art.
@@ -68,11 +69,6 @@ def draw_picture(betas, steps, alphas, lws):
     plt.xlim(0, np.min([ts.max() for ts, ys in results]))
 
     return fig
-
-betas = [1, 1, 1]
-steps = [50, 50, 50]
-alphas = [.3, .6, .9]
-lws = [2, 3, 5]
 
 def animations(betas, steps, alphas, lws):
     """Draw an animation of a simulation of our pseduo-poisson process.
