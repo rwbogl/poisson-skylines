@@ -53,7 +53,7 @@ def draw_picture(betas, steps, alphas, lws):
         top='off',
         labelbottom='off')
 
-    for result, alpha, lw in zip(results, alpha, lws):
+    for result, alpha, lw in zip(results, alphas, lws):
         ts, ys = result
         plt.step(ts, ys, alpha=alpha, lw=lw)
 
